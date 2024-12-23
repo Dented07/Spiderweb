@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Product Id="*" 
+             Name="SpiderWeb" 
+             Language="1033" 
+             Version="1.0.0.0" 
+             Manufacturer="Your Name" 
+             UpgradeCode="PUT-GUID-HERE">
+        
+        <Package InstallerVersion="200" 
+                 Compressed="yes" 
+                 InstallScope="perMachine" />
+
+        <MajorUpgrade DowngradeErrorMessage="A newer version is already installed." />
+        <MediaTemplate EmbedCab="yes" />
+        
+        <Feature Id="ProductFeature" Title="SpiderWeb" Level="1">
+            <ComponentGroupRef Id="ProductComponents" />
+            <ComponentRef Id="ApplicationShortcut" />
+        </Feature>
+
+        <!-- Check for Java -->
+        <Property Id="JAVA_CURRENT_VERSION">
+            <RegistrySearch Id="JREVersion" 
+                          Root="HKLM" 
+                          Key="SOFTWARE\JavaSoft\Java Runtime Environment" 
+                          Name="CurrentVersion" 
+                          Type="raw" />
+        </Property>
+        <Condition Message="This application requires Java Runtime Environment. Please install Java and run this installer again.">
+            <![CDATA[Installed OR JAVA_CURRENT_VERSION]]>
+        </Condition>
+        
+        <!-- Start Menu Shortcut -->
+        <DirectoryRef Id="ApplicationProgramsFolder">
+            <Component Id="ApplicationShortcut" Guid="*">
+                <Shortcut Id="ApplicationStartMenuShortcut" 
+                         Name="SpiderWeb" 
+                         Description="SpiderWeb Game"
+                         Target="[INSTALLFOLDER]SpiderWeb.exe"
+                         WorkingDirectory="INSTALLFOLDER" />
+                <RemoveFolder Id="CleanUpShortCut" Directory="ApplicationProgramsFolder" On="uninstall" />
+                <RegistryValue Root="HKCU" Key="Software\SpiderWeb" Name="installed" Type="integer" Value="1" KeyPath="yes" />
+            </Component>
+        </DirectoryRef>
+    </Product>
+
+    <Fragment>
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <Directory Id="ProgramFilesFolder">
+                <Directory Id="INSTALLFOLDER" Name="SpiderWeb" />
+            </Directory>
+            <Directory Id="ProgramMenuFolder">
+                <Directory Id="ApplicationProgramsFolder" Name="SpiderWeb" />
+            </Directory>
+            <Directory Id="DesktopFolder" Name="Desktop" />
+        </Directory>
+    </Fragment>
+
+    <Fragment>
+        <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+            <Component Id="ProductComponent" Guid="*">
+                <File Id="SpiderWebEXE" Source="SpiderWeb.exe" KeyPath="yes" />
+                <File Id="SpiderWebJAR" Source="SpiderWeb.jar" />
+                
+                <!-- Desktop Shortcut -->
+                <Shortcut Id="DesktopShortcut"
+                         Directory="DesktopFolder"
+                         Name="SpiderWeb"
+                         WorkingDirectory="INSTALLFOLDER"
+                         Target="[INSTALLFOLDER]SpiderWeb.exe"
+                         Icon="SpiderWeb.exe" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix> 
